@@ -4,6 +4,7 @@
     "outDir": "dist",
     "strict": true,
     "module": "nodenext",
+    "skipLibCheck": true,
     "lib": [
       "ES2020"
     ],
