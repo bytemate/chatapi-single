@@ -48,6 +48,24 @@ npm i
 ```sh
 npm run start
 ```
+## How to use 
+
+### OneTime Message
+```sh
+curl -X "POST" "http://localhost:4000/message" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{
+  "message": "Hello"
+}'
+```
+### Session Message
+```sh
+curl -X "POST" "http://localhost:4000/message/holegots" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{
+  "message": "Hello"
+}'
+```
 
 ## Author
 
