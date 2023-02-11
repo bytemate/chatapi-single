@@ -11,7 +11,32 @@
 
 > Chatgpt-api-single is a simple, easy-to-use API server that comes with a queueing capability to prevent large-scale failures due to excessive access. It has a simple encapsulation and comes with a Dockerfile, so all you need to do is modify the environment variables to get started. :thumbsup:
 
+## Config
 
+```sh
+cp .env.example .env
+```
+
+
+**Modify the environment variables in .env**
+
+```dotenv
+# Require
+EMAIL=<Your Email>
+# Require
+PASSWORD=<Your Password>
+IS_PRO_ACCOUNT=false
+MARKDOWN=false
+DEBUG=false
+IS_GOOGLE_LOGIN=false
+IS_MICROSOFT_LOGIN=false
+MINIMIZE=false
+CAPTCHA_TOKEN=
+NOPECHA_KEY=
+EXECUTABLE_PATH=
+PROXY_SERVER=
+USER_DATA_DIR=
+```
 ## Install
 
 ```sh
