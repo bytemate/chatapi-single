@@ -61,10 +61,7 @@ const sendMesasge = async (message: string, sessionId?: string) => {
     conversationInfo = await getOrCreateConversationInfo(sessionId);
   }
   const jobId = randomUUID();
-  if (!config.isProAccount) {
-    // Enable queue for account
-    await mesasgeQueue.wait(jobId);
-  }
+  await mesasgeQueue.wait(jobId);
   const startTime = new Date().getTime();
   let response;
   try {
@@ -73,10 +70,7 @@ const sendMesasge = async (message: string, sessionId?: string) => {
     console.error(e);
     throw e;
   } finally {
-    if (!config.isProAccount) {
-      // Enable queue for account
-      mesasgeQueue.end(jobId);
-    }
+    mesasgeQueue.end(jobId);
   }
   const endTime = new Date().getTime();
   if (sessionId) {
