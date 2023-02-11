@@ -1,0 +1,11 @@
+version: '3.7'
+services:
+  chatgpt-api:
+    image: ghcr.io/bytemate/chatapi-single:main
+    container_name: chatgpt-api-single
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./data:/app/data
+    env_file:
+      - .env

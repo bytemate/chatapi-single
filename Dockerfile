@@ -12,5 +12,5 @@ COPY package-lock.json .
 RUN npm install
 COPY . .
 RUN npm run build
-EXPOSE 3000
+EXPOSE 4000
 CMD ["bash","-c","npx prisma migrate deploy && node dist/index.js"]
