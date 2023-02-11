@@ -11,6 +11,11 @@
 
 > Chatgpt-api-single is a simple, easy-to-use API server that comes with a queueing capability to prevent large-scale failures due to excessive access. It has a simple encapsulation and comes with a Dockerfile, so all you need to do is modify the environment variables to get started. :thumbsup:
 
+## Quick Start
+
+```sh
+docker run -d --name chatgpt-api-single -p 4000:4000 -v /home/ubuntu/chatapi-single/data:/app/data -e EMAIL=<YourOpenAIAccount> -e PASSWORD=<YourOpenAIAccountPassword> ghcr.io/bytemate/chatapi-single:main
+```
 ## Config
 
 ```sh
