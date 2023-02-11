@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "outDir": "dist",
+    "strict": true,
+    "module": "nodenext",
+    "lib": [
+      "ES2020"
+    ],
+    "esModuleInterop": true
+  }
+}
