@@ -14,7 +14,9 @@
 ## Quick Start
 
 ```sh
-docker run -d --name chatgpt-api-single -p 4000:4000 -v /home/ubuntu/chatapi-single/data:/app/data -e EMAIL=<YourOpenAIAccount> -e PASSWORD=<YourOpenAIAccountPassword> ghcr.io/bytemate/chatapi-single:main
+docker run -d --name chatgpt-api-single -e EMAIL=<YourOpenAIAccount> -e PASSWORD=<YourOpenAIAccountPassword> -p 4000:4000 -v ${PWD}/data:/app/data ghcr.io/bytemate/chatapi-single:main
+# See log
+docker logs -f chatgpt-api-single
 ```
 ## Config
 
