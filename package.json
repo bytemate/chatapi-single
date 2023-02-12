@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "postbuild": "npx prisma generate",
-    "start": "node dist/src/index.js",
+    "start": "node dist/index.js",
     "build": "tsc"
   },
   "dependencies": {
