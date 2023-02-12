@@ -13,4 +13,4 @@ RUN npm install
 COPY . .
 RUN npm run build
 EXPOSE 4000
-CMD ["bash","-c","npx prisma migrate deploy && node dist/index.js"]
+CMD npx prisma migrate deploy && xvfb-run --server-args="-screen 0 1280x800x24 -ac -nolisten tcp -dpi 96 +extension RANDR -maxclients 2048" node dist/index.js
