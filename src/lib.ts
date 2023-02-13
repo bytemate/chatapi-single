@@ -1,7 +1,11 @@
+import axios from "axios";
 import "dotenv/config";
+import Keyv from "keyv";
 export interface ChatGPTAPIBrowserConfig {
   email: string;
   password: string;
+  sessionToken?: string;
+  reverseProxyUrl?: string;
   isProAccount?: boolean;
   markdown?: boolean;
   debug?: boolean;
@@ -30,6 +34,11 @@ export const loadConfig = (): ChatGPTAPIBrowserConfig => {
   return {
     email,
     password,
+    sessionToken: process.env.SESSION_TOKEN
+    ,
+    reverseProxyUrl:
+      process.env.REVERSE_PROXY_URL ||
+      "https://chat.y1s1.host/completions",
     isProAccount: process.env.IS_PRO_ACCOUNT === "true",
     markdown: process.env.MARKDOWN === "true",
     debug: process.env.DEBUG === "true",
@@ -51,4 +60,27 @@ export const loadConfig = (): ChatGPTAPIBrowserConfig => {
       ? process.env.USER_DATA_DIR
       : undefined,
   };
+};
+const kv = new Keyv();
+
+export const getAccessToken = async (sessionToken: string) => {
+  if (await kv.has(sessionToken)) {
+    return await kv.get(sessionToken);
+  }
+  const response = await axios({
+    method: "GET",
+    url: "https://explorer.api.openai.com/api/auth/session",
+    headers: {
+      Cookie: `__Secure-next-auth.session-token=${sessionToken};`,
+    },
+  });
+  try {
+    const accessToken = response.data.accessToken;
+    console.log("Got new access token");
+    console.log(accessToken);
+    await kv.set(sessionToken, accessToken, 60 * 60 * 1000);
+    return accessToken;
+  } catch {
+    return null;
+  }
 };

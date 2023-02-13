@@ -28,3 +28,10 @@ model Result {
   messageId       String
   responseTime    Int      @default(0)
 }
+
+model messageCache {
+  key   String @id
+  value String
+  
+  @@map("message_cache")
+}
