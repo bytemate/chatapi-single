@@ -94,7 +94,9 @@ const sendMesasge = async (message: string, sessionId?: string) => {
         conversationId: response.conversationId,
         messageId: response.messageId,
       },
-      update: {},
+      update: {
+        messageId: response.messageId,
+      },
     });
   }
   await prisma.result.create({
@@ -158,6 +160,36 @@ async function generateChatGPTClient() {
     },
     debug: config.debug,
   });
+  // Patch Keyv
+  // @ts-ignore
+  chatGPTAPIBrowser.conversationsCache = {
+    get: async (key: string) => {
+      const result = await prisma.messageCache.findUnique({
+        where: {
+          key,
+        },
+        select: {
+          value: true,
+        },
+      });
+      return result ? JSON.parse(result.value) : result;
+    },
+    set: async (key: string, value: any) => {
+      value = JSON.stringify(value);
+      await prisma.messageCache.upsert({
+        where: {
+          key,
+        },
+        create: {
+          key,
+          value,
+        },
+        update: {
+          value,
+        },
+      });
+    },
+  };
 }
 async function main() {
   // @ts-ignore
