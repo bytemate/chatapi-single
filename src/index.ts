@@ -60,15 +60,10 @@ const sendMesasge = async (message: string, sessionId?: string) => {
     conversationInfo = await getOrCreateConversationInfo(sessionId);
   }
   const jobId = randomUUID();
-  if (!config.sessionToken) {
-    await mesasgeQueue.wait(jobId);
-  }
+  await mesasgeQueue.wait(jobId);
   const startTime = new Date().getTime();
   let response;
   try {
-    if (config.sessionToken) {
-      await generateChatGPTClient();
-    }
     response = await chatGPTAPIBrowser.sendMessage(message, conversationInfo);
     console.log(response);
     console.log(`Response: ${response}`);
@@ -76,9 +71,7 @@ const sendMesasge = async (message: string, sessionId?: string) => {
     console.error(e);
     throw e;
   } finally {
-    if (!config.sessionToken) {
-      mesasgeQueue.end(jobId);
-    }
+    mesasgeQueue.end(jobId);
   }
   const endTime = new Date().getTime();
   if (sessionId) {
@@ -146,62 +139,22 @@ app.delete(`/message/:sessionId`, async (req, res) => {
     });
   }
 });
-async function generateChatGPTClient() {
-  // @ts-ignore
-  const { ChatGPTClient } = await import("@waylaidwanderer/chatgpt-api");
-  const accessToken = await getAccessToken(config.sessionToken || "");
-  chatGPTAPIBrowser = new ChatGPTClient(accessToken, {
-    reverseProxyUrl: config.reverseProxyUrl,
-    modelOptions: {
-      stream: false,
-      model: config.isProAccount
-        ? "text-davinci-002-render-paid"
-        : "text-davinci-002-render",
-    },
-    debug: config.debug,
-  });
-  // Patch Keyv
-  // @ts-ignore
-  chatGPTAPIBrowser.conversationsCache = {
-    get: async (key: string) => {
-      const result = await prisma.messageCache.findUnique({
-        where: {
-          key,
-        },
-        select: {
-          value: true,
-        },
-      });
-      return result ? JSON.parse(result.value) : result;
-    },
-    set: async (key: string, value: any) => {
-      value = JSON.stringify(value);
-      await prisma.messageCache.upsert({
-        where: {
-          key,
-        },
-        create: {
-          key,
-          value,
-        },
-        update: {
-          value,
-        },
-      });
-    },
-  };
-}
 async function main() {
   // @ts-ignore
   console.log(
     `Starting chatgpt with config: ${JSON.stringify(config, null, 2)}`
   );
+  const { ChatGPTAPIBrowser, ChatGPTAPI } = await import("chatgpt");
   // if sessionsToken is not provided, it will use the default token.
   if (config.sessionToken) {
     // @ts-ignore
-    await generateChatGPTClient();
+    chatGPTAPIBrowser = new ChatGPTAPI({
+      sessionToken: config.sessionToken,
+      clearanceToken: "proxy-dont-use-this-token",
+      backendApiBaseUrl: config.reverseProxyUrl + "/api",
+      apiBaseUrl: "https://explorer.api.openai.com/api",
+    });
   } else {
-    const { ChatGPTAPIBrowser } = await import("chatgpt");
     chatGPTAPIBrowser = new ChatGPTAPIBrowser(config);
     await AsyncRetry(
       async () => {
