@@ -34,11 +34,9 @@ export const loadConfig = (): ChatGPTAPIBrowserConfig => {
   return {
     email,
     password,
-    sessionToken: process.env.SESSION_TOKEN
-    ,
-    reverseProxyUrl:
-      process.env.REVERSE_PROXY_URL ||
-      "https://chat.y1s1.host/completions",
+    sessionToken: process.env.SESSION_TOKEN,
+    // FIXME: find new reverse proxy
+    reverseProxyUrl: process.env.REVERSE_PROXY_URL || "https://chat.y1s1.host",
     isProAccount: process.env.IS_PRO_ACCOUNT === "true",
     markdown: process.env.MARKDOWN === "true",
     debug: process.env.DEBUG === "true",
