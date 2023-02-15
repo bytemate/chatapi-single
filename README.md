@@ -48,6 +48,7 @@ USER_DATA_DIR=
 
 ```sh
 npm i
+npx prisma migrate deploy
 ```
 
 ## Usage
