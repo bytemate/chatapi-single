@@ -37,8 +37,8 @@ jobs:
           arch: ${{ matrix.arch }}
           distro: ${{ matrix.distro }}
           githubToken: ${{ github.token }}
-        # run: |
-        #   uname -a
+          run: |
+            uname -a
         #   echo ::set-output name=uname::$(uname -a)
 
       - name: Log in to the Container registry
