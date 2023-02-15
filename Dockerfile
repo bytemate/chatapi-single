@@ -1,13 +1,27 @@
 FROM node:19
 WORKDIR /app
-# We don't need the standalone Chromium
-COPY debian-stable.list /etc/apt/sources.list.d/debian-stable.list
-RUN apt-get install -y wget  curl gnupg \ 
-  && apt-get update && apt-get -y install chromium xvfb \
-  && echo "Chrome: " && chromium --version \
-  && ln -s /usr/bin/chromium /usr/bin/google-chrome-stable
-  && rm -rf /var/lib/apt/lists/* 
+ARG TARGETPLATFORM
 
+RUN echo "Building for $TARGETPLATFORM"
+
+# We don't need the standalone Chromium
+RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+      COPY debian-stable.list /etc/apt/sources.list.d/debian-stable.list; \
+      RUN apt-get install -y wget  curl gnupg \ 
+        && apt-get update && apt-get -y install chromium xvfb \
+        && echo "Chrome: " && chromium --version \
+        && ln -s /usr/bin/chromium /usr/bin/google-chrome-stable
+        && rm -rf /var/lib/apt/lists/* ;
+    else \
+    RUN apt-get install -y wget \ 
+      && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \ 
+      && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
+      && apt-get update && apt-get -y install google-chrome-stable chromium  xvfb\
+      && rm -rf /var/lib/apt/lists/* \
+      && echo "Chrome: " && google-chrome --version ; \
+   fi
+
+   
 COPY package.json .
 COPY package-lock.json .
 RUN npm install
