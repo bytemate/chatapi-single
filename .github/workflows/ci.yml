@@ -11,10 +11,13 @@ env:
 
 jobs:
   build:
+  
     runs-on: ${{ matrix.os }}
+#   name: Build on ${{ matrix.distro }} ${{ matrix.arch }}
+    
     strategy:
       matrix:
-        os: [ubuntu-latest, ubuntu-latest-arm64]
+        os: [ubuntu-latest-aarch64, ubuntu-latest]
     permissions:
       contents: read
       packages: write
