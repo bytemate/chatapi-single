@@ -1,0 +1,7 @@
+image:
+  file: .gitpod.Dockerfile
+
+tasks:
+  - init: nvm i 18 && npm install
+    command: npm run dev
+  - init: npx prisma migrate deploy

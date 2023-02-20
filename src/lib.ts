@@ -19,17 +19,20 @@ export interface ChatGPTAPIBrowserConfig {
   userDataDir?: string;
 }
 export const loadConfig = (): ChatGPTAPIBrowserConfig => {
-  const email = process.env.EMAIL;
-  if (!email) {
-    throw new Error(
-      "Please provide email in .env file or environment variable"
-    );
-  }
-  const password = process.env.PASSWORD;
-  if (!password) {
-    throw new Error(
-      "Please provide password in .env file or environment variable"
-    );
+  const email = process.env.EMAIL ?? '';
+  const password = process.env.PASSWORD ?? '';
+  // session token don't require email and password
+  if(!process.env.SESSION_TOKEN) {
+    if (!email) {
+      throw new Error(
+        "Please provide email in .env file or environment variable"
+      );
+    }
+    if (!password) {
+      throw new Error(
+        "Please provide password in .env file or environment variable"
+      );
+    }
   }
   return {
     email,
