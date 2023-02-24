@@ -254,7 +254,7 @@ async function main() {
     );
   }
   const PORT = Number(process.env.PORT) || 4000;
-  const HOST = process.env.HOST || "localhost";
+  const HOST = process.env.HOST || "::";
   console.log(`🎉 Started chatgpt success!`);
   app.listen(PORT, HOST, () => {
     console.log(`🚀 Server ready at: http://${HOST}:${PORT}/`);
