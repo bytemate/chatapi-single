@@ -230,6 +230,7 @@ async function main() {
   );
   // @ts-ignore
   const { ChatGPTBrowserClient} = await import("@waylaidwanderer/chatgpt-api");
+  const { ChatGPTAPIBrowser, ChatGPTAPI } = await import("chatgpt");
 
   // if sessionsToken is not provided, it will use the default token.
   if (config.sessionToken) {

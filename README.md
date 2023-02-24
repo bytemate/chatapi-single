@@ -21,7 +21,7 @@ docker logs -f chatgpt-api-single
 
 For how generate session, all you need is your access token from https://chat.openai.com/api/auth/session
 ```sh
-docker run -d --name chatgpt-api-single -e SESSION_TOKEN=<YourSesstion> -p 4000:4000 -v ${PWD}/data:/app/data ghcr.io/bytemate/chatapi-single:main
+docker run -d --name chatgpt-api-single -e SESSION_TOKEN=<YourSesstion> -p 4000:4000 -v $PWD/data:/app/data ghcr.io/bytemate/chatapi-single:main
 ```
 ## Config
 
