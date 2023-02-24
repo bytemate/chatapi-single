@@ -127,9 +127,9 @@ const sendMesasge = async (
   await prisma.result.create({
     data: {
       request: message,
-      response: response.text,
+      response: response.response,
       conversationsId: response.conversationId,
-      messageId: response.id,
+      messageId: response.messageId,
       responseTime: endTime - startTime,
     },
   });
@@ -228,13 +228,18 @@ async function main() {
   console.log(
     `Starting chatgpt with config: ${JSON.stringify(config, null, 2)}`
   );
-  const { ChatGPTUnofficialProxyAPI } = await import("chatgpt");
+  const { ChatGPTBrowserClient} = await import("@waylaidwanderer/chatgpt-api");
+
+    // import ChatGPTClient from '@waylaidwanderer/chatgpt-api';
+
   // if sessionsToken is not provided, it will use the default token.
   if (config.sessionToken) {
     // @ts-ignore
-    chatGPTAPIBrowser = new ChatGPTUnofficialProxyAPI({
-      accessToken: config.sessionToken
-    })
+    chatGPTAPIBrowser = new ChatGPTBrowserClient({
+        reverseProxyUrl: 'https://chatgpt.duti.tech/api/conversation',
+        accessToken: config.sessionToken
+      }
+    )
   } else {
     chatGPTAPIBrowser = new ChatGPTAPIBrowser(config);
     await AsyncRetry(
