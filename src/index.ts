@@ -228,9 +228,8 @@ async function main() {
   console.log(
     `Starting chatgpt with config: ${JSON.stringify(config, null, 2)}`
   );
+  // @ts-ignore
   const { ChatGPTBrowserClient} = await import("@waylaidwanderer/chatgpt-api");
-
-    // import ChatGPTClient from '@waylaidwanderer/chatgpt-api';
 
   // if sessionsToken is not provided, it will use the default token.
   if (config.sessionToken) {
