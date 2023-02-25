@@ -9,6 +9,7 @@ RUN apt-get install -y wget \
   && echo "Chrome: " && google-chrome --version
 COPY package.json .
 COPY package-lock.json .
+COPY ./patches ./patches
 RUN npm install
 COPY . .
 RUN npm run build
