@@ -1,13 +1,12 @@
 diff --git a/node_modules/@waylaidwanderer/chatgpt-api/src/ChatGPTBrowserClient.js b/node_modules/@waylaidwanderer/chatgpt-api/src/ChatGPTBrowserClient.js
-index 1327135..ce6d90a 100644
+index 1327135..4f707ad 100644
 --- a/node_modules/@waylaidwanderer/chatgpt-api/src/ChatGPTBrowserClient.js
 +++ b/node_modules/@waylaidwanderer/chatgpt-api/src/ChatGPTBrowserClient.js
-@@ -149,7 +149,9 @@ export default class ChatGPTBrowserClient {
+@@ -149,7 +149,8 @@ export default class ChatGPTBrowserClient {
          let conversation;
          if (conversationId) {
              conversation = await this.conversationsCache.get(conversationId);
 -        } else {
-+            console.log(conversation)
 +        }
 +        if (!conversation) {
              conversation = {
