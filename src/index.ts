@@ -1,7 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 // @ts-ignore
 import { ChatGPTAPIBrowser, ChatResponse, SendMessageOptions } from "chatgpt";
-import { loadConfig, getAccessToken } from "./lib";
+// @ts-ignore
+import { ChatGPTUnofficialProxyAPI } from "chatgptV4";
+import { config } from "./lib";
+import { openaiAuth } from "./openai.auth";
 import express from "express";
 import AsyncRetry from "async-retry";
 import { Queue } from "async-await-queue";
@@ -10,10 +13,14 @@ import Keyv from "keyv";
 const prisma = new PrismaClient();
 // ChatGPT (not plus) is limited to 1 request one time.
 const mesasgeQueue = new Queue(1, 100);
-const config = loadConfig();
 const app = express();
-const kv = new Keyv();
-let chatGPTAPIBrowser: ChatGPTAPIBrowser;
+const kv = new Keyv(
+  {
+    url: config.cacheUrl,
+    namespace: "chatgpt-message",
+  }
+);
+let chatGPTAPI: ChatGPTAPIBrowser;
 app.use(express.json());
 app.get(`/`, async (req, res) => {
   return res.json({
@@ -46,6 +53,13 @@ const sendMesasge = async (
   mesasgeId?: string
 ) => {
   let conversationInfo;
+  const accessToken = await openaiAuth.getAccessToken();
+  const { ChatGPTUnofficialProxyAPI } = await import("chatgptV4");
+  const chatGPTClient = new ChatGPTUnofficialProxyAPI({
+    accessToken,
+    apiReverseProxyUrl: config.reverseProxyUrl,
+    model: config.model,
+  });
   if (sessionId) {
     conversationInfo = await getOrCreateConversationInfo(sessionId);
   }
@@ -70,15 +84,17 @@ const sendMesasge = async (
     );
   }
   try {
-    response = await chatGPTAPIBrowser.sendMessage(message, {
+    response = await chatGPTClient.sendMessage(message, {
       ...conversationInfo,
       messageId: mesasgeId,
       onProgress: mesasgeId
-        ? async (partialResponse: ChatResponse) => {
+        ? async (partialResponse) => {
             await kv.set(
               mesasgeId,
               {
                 ...partialResponse,
+                messageId: partialResponse.id,
+                response: partialResponse.text,
                 status: endFlag ? "done" : "process",
               },
               30 * 60 * 1000
@@ -86,6 +102,11 @@ const sendMesasge = async (
           }
         : undefined,
     });
+    response = {
+      ...response,
+      messageId: response.id,
+      response: response.text,
+    };
     endFlag = true;
     console.log(response);
     console.log(`Response: ${response}`);
@@ -106,17 +127,18 @@ const sendMesasge = async (
     mesasgeQueue.end(jobId);
   }
   const endTime = new Date().getTime();
+  const conversationId = response.conversationId || randomUUID();
   if (sessionId) {
     await prisma.conversations.upsert({
       where: {
         sessionId_conversationId: {
           sessionId,
-          conversationId: response.conversationId,
+          conversationId,
         },
       },
       create: {
         sessionId,
-        conversationId: response.conversationId,
+        conversationId,
         messageId: response.messageId,
       },
       update: {
@@ -128,7 +150,7 @@ const sendMesasge = async (
     data: {
       request: message,
       response: response.response,
-      conversationsId: response.conversationId,
+      conversationsId: conversationId,
       messageId: response.messageId,
       responseTime: endTime - startTime,
     },
@@ -194,7 +216,6 @@ app.post(`/message/:sessionId`, async (req, res) => {
 });
 app.get("/message/:messageId", async (req, res) => {
   const { messageId } = req.params;
-  console.log(`${messageId}`);
   const response = await kv.get(messageId);
   if (response) {
     return res.json(response);
@@ -228,31 +249,9 @@ async function main() {
   console.log(
     `Starting chatgpt with config: ${JSON.stringify(config, null, 2)}`
   );
-  const { ChatGPTAPIBrowser, ChatGPTAPI } = await import("chatgpt");
+  // Try Login or with cache
+  await openaiAuth.getAccessToken();
   // if sessionsToken is not provided, it will use the default token.
-  if (config.sessionToken) {
-    // @ts-ignore
-    chatGPTAPIBrowser = new ChatGPTAPI({
-      sessionToken: config.sessionToken,
-      clearanceToken: "proxy-dont-use-this-token",
-      backendApiBaseUrl: config.reverseProxyUrl + "/api",
-      apiBaseUrl: "https://explorer.api.openai.com/api",
-    });
-  } else {
-    chatGPTAPIBrowser = new ChatGPTAPIBrowser(config);
-    await AsyncRetry(
-      async () => {
-        await chatGPTAPIBrowser.initSession();
-      },
-      {
-        retries: 5,
-        onRetry: (error) => {
-          console.error(`Starting chatgpt failed, retrying...`);
-          console.error(error);
-        },
-      }
-    );
-  }
   const PORT = Number(process.env.PORT) || 4000;
   const HOST = process.env.HOST || "::";
   console.log(`🎉 Started chatgpt success!`);
