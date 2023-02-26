@@ -9,6 +9,7 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@keyv/offline": "^3.0.7",
     "@keyv/sqlite": "^3.6.4",
     "@prisma/client": "4.10.1",
     "@waylaidwanderer/chatgpt-api": "^1.15.2",
@@ -20,6 +21,7 @@
     "dotenv": "^16.0.3",
     "express": "4.18.2",
     "http-cookie-agent": "^5.0.2",
+    "keyv-file": "^0.2.0",
     "sqlite": "^4.1.2",
     "tough-cookie": "^4.1.2",
     "tsx": "^3.12.3"

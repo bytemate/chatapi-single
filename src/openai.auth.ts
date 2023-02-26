@@ -4,12 +4,35 @@ import { CookieJar } from "tough-cookie";
 import { HttpCookieAgent, HttpsCookieAgent } from "http-cookie-agent/http";
 import qs from "qs";
 import Keyv from "keyv";
+import KeyvFile from "keyv-file";
 import { config } from "./lib";
+const getDataBasePath = () => {
+  if (process.env.NODE_ENV === "production") {
+    return "/tmp/cache.json";
+  } else {
+    // get dirname parent
+    const dirname = __dirname.split("/");
+    dirname.pop();
+    return `${dirname.join("/")}/data/cache.json`;
+  }
+};
 // Default cache url is memory
-const keyv = new Keyv({
-  uri: config.cacheUrl,
-  namespace: "openai-auth",
-});
+const keyv = new Keyv(
+  config.cacheUrl
+    ? {
+        url: config.cacheUrl,
+        namespace: "openai-auth",
+      }
+    : {
+        store: new KeyvFile({
+          filename: `${getDataBasePath()}`, // the file path to store the data
+          expiredCheckDelay: 60 * 60 * 1000, // ms, check and remove expired data in each ms
+          writeDelay: 100, // ms, batch write to disk in a specific duration, enhance write performance.
+          encode: JSON.stringify, // serialize function
+          decode: JSON.parse, // deserialize function
+        }),
+      }
+);
 export class OpenAIAuth {
   sessionToken: string;
   private email: string;
@@ -42,7 +65,7 @@ export class OpenAIAuth {
     this.sessionToken = "";
   }
   async start() {
-    if (await keyv.get("sessionToken")) {
+    if (await keyv.get(`sessionToken-${this.email}`)) {
       this.sessionToken = await keyv.get("sessionToken");
       return;
     }
@@ -336,7 +359,11 @@ export class OpenAIAuth {
       throw new Error("Login failed Session token not found");
     }
     console.log("Session token found");
-    await keyv.set(this.sessionToken, "", 1000 * 60 * 60 * 24 * 30);
+    await keyv.set(
+      `sessionToken-${this.email}`,
+      this.sessionToken,
+      1000 * 60 * 60 * 24 * 30
+    );
   }
   async getAccessToken() {
     if (this.sessionToken === "") {
