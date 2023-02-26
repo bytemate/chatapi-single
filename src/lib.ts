@@ -23,7 +23,7 @@ export const loadConfig = (): ChatGPTAPIBrowserConfig => {
   return {
     email,
     password,
-    reverseProxyUrl: process.env.REVERSE_PROXY_URL || "https://chatgpt.duti.tech/api/conversation",
+    reverseProxyUrl: process.env.REVERSE_PROXY_URL || "https://proxy.y1s1.host/backend-api/conversation",
     proxy: process.env.PROXY,
     model: process.env.MODEL,
     cacheUrl: process.env.CACHE_URL,

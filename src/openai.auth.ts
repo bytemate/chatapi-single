@@ -26,7 +26,7 @@ const keyv = new Keyv(
     : {
         store: new KeyvFile({
           filename: `${getDataBasePath()}`, // the file path to store the data
-          expiredCheckDelay: 60 * 60 * 1000, // ms, check and remove expired data in each ms
+          expiredCheckDelay: 60 * 1000, // ms, check and remove expired data in each ms
           writeDelay: 100, // ms, batch write to disk in a specific duration, enhance write performance.
           encode: JSON.stringify, // serialize function
           decode: JSON.parse, // deserialize function
@@ -66,7 +66,7 @@ export class OpenAIAuth {
   }
   async start() {
     if (await keyv.get(`sessionToken-${this.email}`)) {
-      this.sessionToken = await keyv.get("sessionToken");
+      this.sessionToken = await keyv.get(`sessionToken-${this.email}`);
       return;
     }
     const url = "https://explorer.api.openai.com/";
@@ -366,7 +366,7 @@ export class OpenAIAuth {
     );
   }
   async getAccessToken() {
-    if (this.sessionToken === "") {
+    if (!this.sessionToken) {
       console.log("Session token not found");
       console.log("Start login");
       await this.start();
@@ -389,6 +389,10 @@ export class OpenAIAuth {
     } catch {
       return null;
     }
+  }
+  async resetSessionToken() {
+    this.sessionToken = "";
+    await keyv.delete(`sessionToken-${this.email}`);
   }
 }
 export const openaiAuth = new OpenAIAuth();
