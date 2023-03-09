@@ -229,17 +229,18 @@ async function main() {
     `Starting chatgpt with config: ${JSON.stringify(config, null, 2)}`
   );
   // @ts-ignore
-  const { ChatGPTBrowserClient} = await import("@waylaidwanderer/chatgpt-api");
+  const { ChatGPTClient } = await import("@waylaidwanderer/chatgpt-api");
   const { ChatGPTAPIBrowser, ChatGPTAPI } = await import("chatgpt");
 
   // if sessionsToken is not provided, it will use the default token.
-  if (config.sessionToken) {
+  if (config.apiKey) {
     // @ts-ignore
-    chatGPTAPIBrowser = new ChatGPTBrowserClient({
-        reverseProxyUrl: 'https://chatgpt.duti.tech/api/conversation',
-        accessToken: config.sessionToken
-      }
-    )
+    chatGPTAPIBrowser = new ChatGPTClient(config.apiKey, {
+      modelOptions: {
+        model: "gpt-3.5-turbo",
+        max_tokens: 4096,
+      },
+    });
   } else {
     chatGPTAPIBrowser = new ChatGPTAPIBrowser(config);
     await AsyncRetry(
