@@ -70,6 +70,7 @@ const sendMesasge = async (
     );
   }
   try {
+    console.log(`conversation`, conversationInfo)
     response = await chatGPTAPIBrowser.sendMessage(message, {
       ...conversationInfo,
       messageId: mesasgeId,
@@ -87,8 +88,7 @@ const sendMesasge = async (
         : undefined,
     });
     endFlag = true;
-    console.log(response);
-    console.log(`Response: ${response}`);
+    console.log(`Response`,  response);
   } catch (e) {
     if (mesasgeId) {
       await kv.set(
@@ -238,7 +238,6 @@ async function main() {
     chatGPTAPIBrowser = new ChatGPTClient(config.apiKey, {
       modelOptions: {
         model: "gpt-3.5-turbo",
-        max_tokens: 4096,
       },
     });
   } else {

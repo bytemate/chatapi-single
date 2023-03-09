@@ -76,7 +76,12 @@ curl -X "POST" "http://localhost:4000/message" \
 curl -X "POST" "http://localhost:4000/message/holegots" \
      -H 'Content-Type: application/json; charset=utf-8' \
      -d $'{
-  "message": "Hello"
+  "message": "Write a short poem about cats."
+}'
+curl -X "POST" "http://localhost:4000/message/holegots" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{
+  "message": "rewrite it in Chinise"
 }'
 ```
 
