@@ -11,7 +11,7 @@
   "dependencies": {
     "@keyv/sqlite": "^3.6.4",
     "@prisma/client": "4.10.1",
-    "@waylaidwanderer/chatgpt-api": "^1.28.2",
+    "@waylaidwanderer/chatgpt-api": "^1.37.3",
     "async-await-queue": "^2.1.2",
     "async-retry": "^1.3.3",
     "axios": "^1.3.2",

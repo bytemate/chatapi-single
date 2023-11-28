@@ -237,7 +237,7 @@ async function main() {
     // @ts-ignore
     chatGPTAPIBrowser = new ChatGPTClient(config.apiKey, {
       modelOptions: {
-        model: "gpt-3.5-turbo",
+        model: "gpt-4-1106-preview",
       },
     });
   } else {
