@@ -70,6 +70,7 @@ const sendMesasge = async (
     );
   }
   try {
+    console.log(`conversation`, conversationInfo)
     response = await chatGPTAPIBrowser.sendMessage(message, {
       ...conversationInfo,
       messageId: mesasgeId,
@@ -87,8 +88,7 @@ const sendMesasge = async (
         : undefined,
     });
     endFlag = true;
-    console.log(response);
-    console.log(`Response: ${response}`);
+    console.log(`Response`,  response);
   } catch (e) {
     if (mesasgeId) {
       await kv.set(
@@ -228,15 +228,17 @@ async function main() {
   console.log(
     `Starting chatgpt with config: ${JSON.stringify(config, null, 2)}`
   );
+  // @ts-ignore
+  const { ChatGPTClient } = await import("@waylaidwanderer/chatgpt-api");
   const { ChatGPTAPIBrowser, ChatGPTAPI } = await import("chatgpt");
+
   // if sessionsToken is not provided, it will use the default token.
-  if (config.sessionToken) {
+  if (config.apiKey) {
     // @ts-ignore
-    chatGPTAPIBrowser = new ChatGPTAPI({
-      sessionToken: config.sessionToken,
-      clearanceToken: "proxy-dont-use-this-token",
-      backendApiBaseUrl: config.reverseProxyUrl + "/api",
-      apiBaseUrl: "https://explorer.api.openai.com/api",
+    chatGPTAPIBrowser = new ChatGPTClient(config.apiKey, {
+      modelOptions: {
+        model: "gpt-4-1106-preview",
+      },
     });
   } else {
     chatGPTAPIBrowser = new ChatGPTAPIBrowser(config);
